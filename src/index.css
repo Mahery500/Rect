@@ -1,0 +1,95 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Couleurs issues du système centralisé (src/shared/theme), aucune valeur codée en dur */
+  --color-primary: var(--app-primary);
+  --color-primary-hover: var(--app-primary-hover);
+  --color-primary-active: var(--app-primary-active);
+  --color-secondary: var(--app-secondary);
+  --color-secondary-hover: var(--app-secondary-hover);
+
+  /* Palette ASINA dynamique */
+  --color-asina-50: var(--app-asina-50);
+  --color-asina-100: var(--app-asina-100);
+  --color-asina-200: var(--app-asina-200);
+  --color-asina-300: var(--app-asina-300);
+  --color-asina-400: var(--app-asina-400);
+  --color-asina-500: var(--app-asina-500);
+  --color-asina-600: var(--app-asina-600);
+  --color-asina-700: var(--app-asina-700);
+  --color-asina-800: var(--app-asina-800);
+  --color-asina-900: var(--app-asina-900);
+  --color-asina-950: var(--app-asina-950);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Classes utilitaires personnalisées utilisant les variables du thème centralisé */
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-hover-bg);
+  box-shadow:
+    0 4px 6px -1px var(--btn-primary-shadow),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--btn-secondary-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-secondary-hover-bg);
+  color: var(--btn-secondary-hover-text);
+  border-color: var(--btn-secondary-hover-border);
+}
+
+/* Animations for micro-interactions */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

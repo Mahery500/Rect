@@ -1,0 +1,1 @@
+export { PanneauPharmacieCatalogue } from "./PanneauPharmacieCatalogue";
