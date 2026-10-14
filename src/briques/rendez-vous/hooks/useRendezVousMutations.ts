@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { rendezVousApi } from '../api/Rendezvousapi';
+import { rendezVousApi } from '../api/rendezVousApi';
 import { invalider, useMutation } from './useRequete';
 
 const apresEcriture = () => invalider('rendez-vous', 'creneaux');
