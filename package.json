@@ -14,6 +14,7 @@
     "check": "npm run lint && npm run format:check && npm run build"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.104.2",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

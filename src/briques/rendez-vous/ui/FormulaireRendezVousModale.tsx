@@ -3,156 +3,130 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from "react";
-import { Calendar, User, Clock, MessageSquare } from "lucide-react";
-import { Modale } from "@/noyau/ui/Modale";
-import { ActionsFormulaire } from "@/noyau/ui/ActionsFormulaire";
-import { NouveauRendezVousInput, PatientOption } from "../modele/rendez-vous.types";
+import { useState } from 'react';
+import { useAgendas } from '../hooks/useAgendas';
+import { useCreneauxDisponibles } from '../hooks/useCreneauxDisponibles';
+import { useReserverRendezVous } from '../hooks/useRendezVousMutations';
+import type { CreneauDisponible } from '../modele/types';
 
-export interface FormulaireRendezVousModaleProps {
-  ouvert: boolean;
-  patients: PatientOption[];
+interface Props {
+  /** Patient présélectionné (ex. depuis la fiche patient). */
+  patientId?: number;
+  /** Rendu du sélecteur patient (GET /api/patients). */
+  renderSelecteurPatient: (valeur: number | undefined, changer: (id: number) => void) => React.ReactNode;
   onFermer: () => void;
-  onEnregistrer: (input: NouveauRendezVousInput) => Promise<boolean>;
 }
 
-export const FormulaireRendezVousModale: React.FC<FormulaireRendezVousModaleProps> = ({
-  ouvert,
-  patients,
-  onFermer,
-  onEnregistrer,
-}) => {
-  const dateAujourdHui = new Date().toISOString().split("T")[0];
+const heure = (iso: string) => iso.slice(11, 16);
 
-  const [patientId, setPatientId] = useState<number | "">(
-    patients.length > 0 ? patients[0].id : "",
-  );
-  const [dateRdv, setDateRdv] = useState(dateAujourdHui);
-  const [heureRdv, setHeureRdv] = useState("09:00");
-  const [commentaire, setCommentaire] = useState("");
-  const [enCours, setEnCours] = useState(false);
+export function FormulaireRendezVousModale({ patientId: patientInitial, renderSelecteurPatient, onFermer }: Props) {
+  const [patientId, setPatientId] = useState<number | undefined>(patientInitial);
+  const [agendaId, setAgendaId] = useState<number>();
+  const [date, setDate] = useState('');
+  const [creneau, setCreneau] = useState<CreneauDisponible>();
+  const [commentaire, setCommentaire] = useState('');
 
-  // Synchroniser le premier patient quand la liste change
-  React.useEffect(() => {
-    if (patientId === "" && patients.length > 0) {
-      setPatientId(patients[0].id);
-    }
-  }, [patients, patientId]);
+  const agendas = useAgendas();
+  const creneaux = useCreneauxDisponibles(agendaId, date);
+  const reserver = useReserverRendezVous();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const pret = !!patientId && !!agendaId && !!creneau;
+
+  function soumettre(e: React.SyntheticEvent) {
     e.preventDefault();
-    if (!patientId || !dateRdv || !heureRdv) return;
-
-    setEnCours(true);
-    try {
-      const succes = await onEnregistrer({
-        patientId: Number(patientId),
-        dateRdv,
-        heureRdv,
+    if (!pret) return;
+    reserver.mutate(
+      {
+        patientId: patientId!,
+        agendaId: agendaId!,
+        dateRdv: creneau!.debut.slice(0, 10),
+        heureRdv: heure(creneau!.debut),
         commentaire: commentaire.trim() || undefined,
-      });
-
-      if (succes) {
-        setCommentaire("");
-        onFermer();
-      }
-    } finally {
-      setEnCours(false);
-    }
-  };
+      },
+      {
+        onSuccess: onFermer,
+        // Créneau pris entre-temps : on le désélectionne, la liste est rechargée par l'invalidation.
+        onError: () => setCreneau(undefined),
+      },
+    );
+  }
 
   return (
-    <Modale
-      ouvert={ouvert}
-      onFermer={enCours ? () => {} : onFermer}
-      titre="Planifier un Nouveau Rendez-vous"
-      icone={<Calendar className="h-4 w-4 text-asina-600" />}
-      largeurMax="md"
-      enfants={
-        <form id="form-nouveau-rdv" onSubmit={handleSubmit} className="space-y-4 text-xs">
-          <div>
-            <label className="block text-slate-700 font-semibold mb-1 flex items-center gap-1.5">
-              <User className="h-3.5 w-3.5 text-slate-400" />
-              <span>Patient adhérent *</span>
-            </label>
-            <select
-              value={patientId}
-              disabled={enCours}
-              onChange={(e) => setPatientId(Number(e.target.value))}
-              required
-              className="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs focus:outline-hidden focus:border-asina-500"
-            >
-              <option value="" disabled>
-                — Sélectionner le patient —
+    <div role="dialog" aria-modal="true" aria-labelledby="titre-rdv" className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
+      <form onSubmit={soumettre} className="w-full max-w-lg space-y-4 rounded-lg bg-white p-6 shadow-xl">
+        <h2 id="titre-rdv" className="text-lg font-semibold">Planifier un rendez-vous</h2>
+
+        <div>{renderSelecteurPatient(patientId, setPatientId)}</div>
+
+        <label className="block text-sm">
+          Médecin / agenda
+          <select
+            className="mt-1 w-full rounded border p-2"
+            value={agendaId ?? ''}
+            onChange={(e) => { setAgendaId(e.target.value ? Number(e.target.value) : undefined); setCreneau(undefined); }}
+            disabled={agendas.isLoading}
+          >
+            <option value="">Choisir un agenda</option>
+            {agendas.data?.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.staffNom}{a.specialite ? ` — ${a.specialite}` : ''}
               </option>
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  [{p.matricule}] {p.nomComplet}
-                </option>
-              ))}
-            </select>
-          </div>
+            ))}
+          </select>
+        </label>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-slate-700 font-semibold mb-1 flex items-center gap-1.5">
-                <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                <span>Date de la consultation *</span>
-              </label>
-              <input
-                type="date"
-                required
-                disabled={enCours}
-                value={dateRdv}
-                onChange={(e) => setDateRdv(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs focus:outline-hidden focus:border-asina-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-slate-700 font-semibold mb-1 flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-slate-400" />
-                <span>Heure prévue *</span>
-              </label>
-              <input
-                type="time"
-                required
-                disabled={enCours}
-                value={heureRdv}
-                onChange={(e) => setHeureRdv(e.target.value)}
-                step="900"
-                className="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs focus:outline-hidden focus:border-asina-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-slate-700 font-semibold mb-1 flex items-center gap-1.5">
-              <MessageSquare className="h-3.5 w-3.5 text-slate-400" />
-              <span>Motif / Commentaire de venue</span>
-            </label>
-            <textarea
-              disabled={enCours}
-              value={commentaire}
-              onChange={(e) => setCommentaire(e.target.value)}
-              placeholder="Ex: Visite médicale périodique, consultation médecine du travail..."
-              rows={3}
-              className="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs focus:outline-hidden focus:border-asina-500"
-            />
-          </div>
-        </form>
-      }
-      pied={
-        <div className="w-full">
-          <ActionsFormulaire
-            idFormulaire="form-nouveau-rdv"
-            onAnnuler={onFermer}
-            enCours={enCours}
-            desactive={enCours || !patientId}
-            labelValider="Planifier le rendez-vous"
+        <label className="block text-sm">
+          Date
+          <input
+            type="date"
+            className="mt-1 w-full rounded border p-2"
+            value={date}
+            onChange={(e) => { setDate(e.target.value); setCreneau(undefined); }}
           />
+        </label>
+
+        {agendaId && date && (
+          <fieldset>
+            <legend className="mb-1 text-sm">Créneaux disponibles</legend>
+            {creneaux.isLoading && <p className="text-sm text-gray-500">Chargement des créneaux…</p>}
+            {creneaux.isError && <p className="text-sm text-red-600">Impossible de charger les créneaux. Réessayez.</p>}
+            {creneaux.data?.length === 0 && (
+              <p className="text-sm text-gray-500">Aucun créneau libre ce jour-là. Essayez une autre date.</p>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {creneaux.data?.map((c) => (
+                <button
+                  type="button"
+                  key={c.debut}
+                  aria-pressed={creneau?.debut === c.debut}
+                  onClick={() => setCreneau(c)}
+                  className={`rounded border px-3 py-1 text-sm ${creneau?.debut === c.debut ? 'bg-blue-600 text-white' : 'bg-white'}`}
+                >
+                  {heure(c.debut)}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
+        <label className="block text-sm">
+          Motif
+          <textarea className="mt-1 w-full rounded border p-2" rows={2} value={commentaire} onChange={(e) => setCommentaire(e.target.value)} />
+        </label>
+
+        {reserver.isError && (
+          <p role="alert" className="text-sm text-red-600">
+            Réservation refusée : le créneau n'est peut-être plus libre. Choisissez-en un autre.
+          </p>
+        )}
+
+        <div className="flex justify-end gap-2">
+          <button type="button" onClick={onFermer} className="rounded border px-4 py-2">Annuler</button>
+          <button type="submit" disabled={!pret || reserver.isPending} className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50">
+            {reserver.isPending ? 'Enregistrement…' : 'Planifier'}
+          </button>
         </div>
-      }
-    />
+      </form>
+    </div>
   );
-};
+}

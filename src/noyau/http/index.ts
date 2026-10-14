@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export * from "./types";
-export * from "./erreurApi";
-export * from "./jwt";
-export * from "./session";
-export * from "./collection";
-export * from "./clientHttp";
-export * from "./erreursCloture";
-
+export * from './types';
+export * from './erreurApi';
+export * from './jwt';
+export * from './session';
+export * from './collection';
+export * from './clientHttp';
+export * from './erreursCloture';
+export { extraireMessageErreur } from '@/noyau/utils/erreur';
 // Alias pour compatibilité progressive
 export { clientHttp as apiClient } from "./clientHttp";
 export { ErreurApi as ApiError } from "./erreurApi";

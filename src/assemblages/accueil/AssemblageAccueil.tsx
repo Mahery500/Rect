@@ -3,15 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from "react";
-import { ShieldCheck, Ticket, Calendar, Users, Tv } from "lucide-react";
-import { ModeAffichage } from "@/cerveau/permissions";
-import { SousOnglets, OngletElement } from "@/noyau/ui/SousOnglets";
-import { PanneauVerificationAdherents } from "@/briques/verification-adherents";
-import { PanneauTicketsAccueil } from "@/briques/tickets-accueil";
-import { PanneauRendezVous } from "@/briques/rendez-vous";
-import { PanneauPatients } from "@/briques/patients";
-import { AffichageEcranSalleAttente } from "@/briques/ecran-attente";
+import React, { useState } from 'react';
+import {
+  ShieldCheck,
+  Ticket,
+  Calendar,
+  Users,
+  Tv,
+} from 'lucide-react';
+import { ModeAffichage } from '@/cerveau/permissions';
+import { SousOnglets, OngletElement } from '@/noyau/ui/SousOnglets';
+import { PanneauVerificationAdherents } from '@/briques/verification-adherents';
+import { PanneauTicketsAccueil } from '@/briques/tickets-accueil';
+import { PageRendezVous } from '@/briques/rendez-vous';
+import { PanneauPatients } from '@/briques/patients';
+import { AffichageEcranSalleAttente } from '@/briques/ecran-attente';
 
 export interface AssemblageAccueilProps {
   siteActifId?: number | null;
@@ -87,8 +93,12 @@ export const AssemblageAccueil: React.FC<AssemblageAccueilProps> = ({
         <PanneauTicketsAccueil mode={modeTickets} siteId={siteActifId ?? undefined} />
       )}
 
-      {ongletActif === "rendezvous" && (
-        <PanneauRendezVous mode={modeRendezvous} siteId={siteActifId ?? undefined} />
+      {ongletActif === 'rendezvous' && (
+        <PageRendezVous
+          peutReserver={true}
+          peutGerer={true}
+          siteId={siteActifId ?? undefined}
+        />
       )}
 
       {ongletActif === "patients" && <PanneauPatients mode={modePatients} />}

@@ -9,17 +9,19 @@ export interface Site {
   isActive: boolean;
 }
 
+/* ---- Stocks ---- */
 export interface StockLigne {
   id: number;
   produitId?: number;
   produitLibelle?: string;
   lotId?: number;
-  lotNumero?: string;
+  lotNumero?: string | null;
   datePeremption?: string | null;
   siteId?: number;
   siteNom?: string;
-  quantite: number; // en comprimés
+  quantite: number; // en unités de base (comprimé, flacon, ampoule...)
   seuilAlerte?: number | null;
+  nbUnitesParBoite?: number | null;
 }
 
 /* ---- Ordonnances / prescriptions ---- */
@@ -28,6 +30,7 @@ export type StatutPrescription = "en_attente" | "dispensee" | "annulee";
 export interface DetailPrescription {
   id?: number;
   produitId?: number;
+  medicamentId?: number;
   produitNom?: string;
   qtePrescrite: number;
   posologie?: string | null;
@@ -36,6 +39,8 @@ export interface DetailPrescription {
 
 export interface Prescription {
   id: number;
+  encounterId?: number | null;
+  patientId?: number | null;
   patientNom?: string | null;
   patientPrenom?: string | null;
   patientMatricule?: string | null;
@@ -50,7 +55,11 @@ export interface DispensationDetail {
   numLot: string | null;
   produitNom: string | null;
   datePeremption: string | null; // Y-m-d
+<<<<<<< HEAD
   quantite: number; // en comprimés
+=======
+  quantite: number;              // en unités de base
+>>>>>>> koto
 }
 
 export interface Dispensation {
@@ -118,6 +127,9 @@ export interface ProduitPayload {
   nomCommercial: string;
   medicamentId: number | null;
   conditionnementId: number | null;
+  presentationId?: number | null;
+  titulaire?: string | null;
+  statutAmm?: string | null;
 }
 
 export interface Option {
@@ -135,7 +147,7 @@ export interface Mouvement {
   produitNom?: string;
   lotNumero?: string;
   siteNom?: string;
-  quantite: number; // signée, en comprimés
+  quantite: number; // signée, en unités de base
   reference?: string | null;
 }
 
@@ -144,11 +156,15 @@ export type StatutTransfert = "en_attente" | "valide" | "annule";
 
 export interface Transfert {
   id: number;
+  siteOrigineId?: number;
+  siteDestinationId?: number;
   siteOrigineNom?: string;
   siteDestinationNom?: string;
+  produitId?: number;
   produitNom?: string;
+  lotId?: number;
   lotNumero?: string;
-  quantite: number;
+  quantite: number; // en unités de base (pas en boîtes)
   dateTransfert: string;
   statut: StatutTransfert;
 }
@@ -156,24 +172,29 @@ export interface Transfert {
 export interface TransfertPayload {
   siteOrigineId: number;
   siteDestinationId: number;
-  produitId: number;
+  produitId: number;   // ignoré par le serveur (le produit se déduit du lot)
   lotId: number;
-  quantite: number;
+  quantite: number;    // en boîtes
 }
 
 /* ---- Ajustements ---- */
+<<<<<<< HEAD
 export interface AjustementType {
   id: number;
   libelle: string;
 }
+=======
+export interface AjustementType { id: number; libelle: string; code?: string | null }
+>>>>>>> koto
 
 export interface Ajustement {
   id: number;
   date: string;
-  produitNom?: string;
-  lotNumero?: string;
-  siteNom?: string;
-  typeLibelle?: string;
+  produitNom?: string | null;
+  lotNumero?: string | null;
+  siteId?: number | null;
+  siteNom?: string | null;
+  typeLibelle?: string | null;
   ecart: number;
   motif?: string | null;
 }
@@ -182,6 +203,6 @@ export interface AjustementPayload {
   siteId: number;
   lotId: number;
   typeId: number;
-  quantiteComptee: number;
+  quantiteComptee: number; // en unités de base
   motif: string;
 }

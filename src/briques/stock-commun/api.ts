@@ -88,6 +88,7 @@ export const stockApi = {
   mouvements: (params?: Params) => liste<T.Mouvement>("/mouvements", params),
 
   // Le transfert est créé directement « valide » ; l'annulation passe par DELETE
+<<<<<<< HEAD
   transferts: () => liste<T.Transfert>("/transferts"),
   creerTransfert: (p: T.TransfertPayload) => api.post("/transferts", p),
   annulerTransfert: (id: number) => api.delete(`/transferts/${id}`),
@@ -100,6 +101,30 @@ export const stockApi = {
 
   produits: () => liste<T.Produit>("/produits"),
   creerProduit: (p: T.ProduitPayload) => api.post("/produits", p),
+=======
+  transferts: () => liste<T.Transfert>('/transferts'),
+creerTransfert: (p: T.TransfertPayload) =>
+  api.post('/transferts', {
+    siteOrigineId: p.siteOrigineId,
+    siteDestinationId: p.siteDestinationId,
+    lotId: p.lotId,
+    qte: p.quantite,   // nombre de BOÎTES
+    unite: 'boite',
+  }),
+  annulerTransfert: (id: number) => api.delete(`/transferts/${id}`),
+
+   ajustementTypes: () => liste<T.AjustementType>('/ajustement_types'),
+  ajustements: (siteId?: number) => liste<T.Ajustement>('/stock_ajustements', siteId ? { siteId } : {}),
+creerAjustement: (p: T.AjustementPayload) =>
+  api.post('/stock_ajustements', {
+    siteId: p.siteId,
+    ajustementTypeId: p.typeId,
+    raison: p.motif?.trim() || null,
+    details: [{ lotId: p.lotId, actuallyQuantity: p.quantiteComptee }],
+  }),
+  produits: () => liste<T.Produit>('/produits'),
+  creerProduit: (p: T.ProduitPayload) => api.post('/produits', p),
+>>>>>>> koto
   modifierProduit: (id: number, p: T.ProduitPayload) => api.put(`/produits/${id}`, p),
   supprimerProduit: (id: number) => api.delete(`/produits/${id}`),
 
