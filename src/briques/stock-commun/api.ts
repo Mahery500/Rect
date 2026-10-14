@@ -88,20 +88,6 @@ export const stockApi = {
   mouvements: (params?: Params) => liste<T.Mouvement>("/mouvements", params),
 
   // Le transfert est créé directement « valide » ; l'annulation passe par DELETE
-<<<<<<< HEAD
-  transferts: () => liste<T.Transfert>("/transferts"),
-  creerTransfert: (p: T.TransfertPayload) => api.post("/transferts", p),
-  annulerTransfert: (id: number) => api.delete(`/transferts/${id}`),
-
-  ajustementTypes: () => liste<T.AjustementType>("/ajustement_types"),
-  // Route réelle côté API Platform : /stock_ajustements (ou ajoutez shortName: 'Ajustement' en PHP)
-  ajustements: (siteId?: number) =>
-    liste<T.Ajustement>("/stock_ajustements", siteId ? { siteId } : {}),
-  creerAjustement: (p: T.AjustementPayload) => api.post("/stock_ajustements", p),
-
-  produits: () => liste<T.Produit>("/produits"),
-  creerProduit: (p: T.ProduitPayload) => api.post("/produits", p),
-=======
   transferts: () => liste<T.Transfert>('/transferts'),
 creerTransfert: (p: T.TransfertPayload) =>
   api.post('/transferts', {
@@ -124,7 +110,6 @@ creerAjustement: (p: T.AjustementPayload) =>
   }),
   produits: () => liste<T.Produit>('/produits'),
   creerProduit: (p: T.ProduitPayload) => api.post('/produits', p),
->>>>>>> koto
   modifierProduit: (id: number, p: T.ProduitPayload) => api.put(`/produits/${id}`, p),
   supprimerProduit: (id: number) => api.delete(`/produits/${id}`),
 

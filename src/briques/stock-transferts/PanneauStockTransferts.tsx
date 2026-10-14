@@ -1,15 +1,4 @@
 // stock-transferts/PanneauStockTransferts.tsx
-<<<<<<< HEAD
-import React, { useState } from "react";
-import { Plus } from "lucide-react";
-import type { ModeAffichage } from "@/cerveau/permissions";
-import { stockApi, messageErreur } from "../stock-commun/api";
-import { useListe } from "../stock-commun/useListe";
-import { Badge, Bouton, Erreur, Modal, formatDate } from "../stock-commun/ui";
-import type { StatutTransfert } from "../stock-commun/types";
-import { useStockPermissions } from "@/assemblages/stock/useStockPermissions";
-import { GardeAccesStock } from "@/assemblages/stock/GardeAccesStock";
-=======
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import type { ModeAffichage } from '@/cerveau/permissions';
@@ -19,7 +8,6 @@ import { Badge, Bouton, Erreur, Modal, formatDate } from '../stock-commun/ui';
 import type { StatutTransfert } from '../stock-commun/types';
 import { useStockPermissions } from '@/assemblages/stock/useStockPermissions';
 import { GardeAccesStock } from '@/assemblages/stock/GardeAccesStock';
->>>>>>> koto
 
 const statuts: Record<StatutTransfert, { t: string; ton: "orange" | "vert" | "rouge" }> = {
   en_attente: { t: "En attente", ton: "orange" },
@@ -27,17 +15,6 @@ const statuts: Record<StatutTransfert, { t: string; ton: "orange" | "vert" | "ro
   annule: { t: "Annulé", ton: "rouge" },
 };
 
-<<<<<<< HEAD
-const FormulaireTransfert: React.FC<{ origineId: number; onTermine: () => void }> = ({
-  origineId,
-  onTermine,
-}) => {
-  const sites = useListe(stockApi.sites);
-  const stocks = useListe(() => stockApi.niveaux(origineId), [origineId]);
-  const [destId, setDestId] = useState<number | "">("");
-  const [stockId, setStockId] = useState<number | "">("");
-  const [quantite, setQuantite] = useState(1);
-=======
 /** « 33 boîtes + 10 u. » */
 const enBoites = (unites: number, parBoite: number) => {
   const boites = Math.floor(unites / parBoite);
@@ -53,7 +30,6 @@ const FormulaireTransfert: React.FC<{ origineId: number; onTermine: () => void }
   const [destId, setDestId] = useState<number | ''>('');
   const [stockId, setStockId] = useState<number | ''>('');
   const [boites, setBoites] = useState('1');
->>>>>>> koto
   const [erreur, setErreur] = useState<string | null>(null);
   const [occupe, setOccupe] = useState(false);
 
@@ -71,32 +47,17 @@ const FormulaireTransfert: React.FC<{ origineId: number; onTermine: () => void }
   const nb = Number(boites);
 
   const valider = async () => {
-<<<<<<< HEAD
-    if (!destId) return setErreur("Choisissez le site de destination.");
-    if (!ligne?.produitId || !ligne.lotId) return setErreur("Choisissez un lot.");
-    if (quantite < 1 || quantite > ligne.quantite)
-      return setErreur(`Quantité invalide (max ${ligne.quantite}).`);
-=======
     if (!destId) return setErreur('Choisissez le site de destination.');
     if (!ligne?.produitId || !ligne.lotId) return setErreur('Choisissez un lot.');
     if (!(parBoite > 0)) return setErreur('Conditionnement inconnu pour ce produit : transfert en boîtes impossible.');
     if (!Number.isInteger(nb) || nb < 1) return setErreur('Indiquez un nombre entier de boîtes.');
     if (nb > maxBoites) return setErreur(`Stock insuffisant : ${maxBoites} boîte(s) complète(s) disponible(s).`);
->>>>>>> koto
     setOccupe(true);
     setErreur(null);
     try {
       await stockApi.creerTransfert({
-<<<<<<< HEAD
-        siteOrigineId: origineId,
-        siteDestinationId: Number(destId),
-        produitId: ligne.produitId,
-        lotId: ligne.lotId,
-        quantite,
-=======
         siteOrigineId: origineId, siteDestinationId: Number(destId),
         produitId: ligne.produitId, lotId: ligne.lotId, quantite: nb,
->>>>>>> koto
       });
       onTermine();
     } catch (e) {
@@ -110,21 +71,6 @@ const FormulaireTransfert: React.FC<{ origineId: number; onTermine: () => void }
     <div className="space-y-4">
       <label className="block text-sm">
         <span className="text-gray-600">Lot à transférer (site actif)</span>
-<<<<<<< HEAD
-        <select
-          value={stockId}
-          onChange={(e) => setStockId(e.target.value ? Number(e.target.value) : "")}
-          className="mt-1 w-full border rounded-lg px-3 py-2"
-        >
-          <option value="">— Choisir —</option>
-          {stocks.items
-            .filter((s) => s.quantite > 0)
-            .map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.produitLibelle} · lot {s.lotNumero} · {s.quantite} cp
-              </option>
-            ))}
-=======
         <select value={stockId}
           onChange={(e) => { setStockId(e.target.value ? Number(e.target.value) : ''); setBoites('1'); }}
           className="mt-1 w-full border rounded-lg px-3 py-2">
@@ -137,7 +83,6 @@ const FormulaireTransfert: React.FC<{ origineId: number; onTermine: () => void }
               </option>
             );
           })}
->>>>>>> koto
         </select>
       </label>
 
@@ -160,16 +105,6 @@ const FormulaireTransfert: React.FC<{ origineId: number; onTermine: () => void }
       </label>
 
       <label className="block text-sm">
-<<<<<<< HEAD
-        <span className="text-gray-600">Quantité (comprimés)</span>
-        <input
-          type="number"
-          min={1}
-          value={quantite}
-          onChange={(e) => setQuantite(Number(e.target.value))}
-          className="mt-1 w-full border rounded-lg px-3 py-2"
-        />
-=======
         <span className="text-gray-600">Quantité (boîtes)</span>
         <input type="number" min={1} step={1} max={maxBoites || undefined} value={boites}
           onChange={(e) => setBoites(e.target.value)} disabled={!ligne || !(parBoite > 0)}
@@ -187,29 +122,17 @@ const FormulaireTransfert: React.FC<{ origineId: number; onTermine: () => void }
               : 'Ce produit n\'a pas de conditionnement : transfert en boîtes impossible.'}
           </span>
         )}
->>>>>>> koto
       </label>
 
       <Erreur message={erreur} />
       <Bouton variante="primaire" disabled={occupe} onClick={valider}>
-<<<<<<< HEAD
-        Créer le transfert
-=======
         {occupe ? 'Transfert…' : 'Créer le transfert'}
->>>>>>> koto
       </Bouton>
     </div>
   );
 };
 
-<<<<<<< HEAD
-export const PanneauStockTransferts: React.FC<{ mode: ModeAffichage; siteActifId?: number }> = ({
-  mode,
-  siteActifId,
-}) => {
-=======
 export const PanneauStockTransferts: React.FC<{ mode: ModeAffichage; siteActifId?: number }> = ({ mode, siteActifId }) => {
->>>>>>> koto
   const permissions = useStockPermissions();
   const { items, erreur, recharger } = useListe(stockApi.transferts);
   const [creation, setCreation] = useState(false);
@@ -255,50 +178,14 @@ export const PanneauStockTransferts: React.FC<{ mode: ModeAffichage; siteActifId
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-gray-600">
             <tr>
-<<<<<<< HEAD
-              <th className="p-3">Date</th>
-              <th className="p-3">Origine → Destination</th>
-              <th className="p-3">Produit</th>
-              <th className="p-3">Lot</th>
-              <th className="p-3 text-right">Qté</th>
-              <th className="p-3">Statut</th>
-              <th className="p-3" />
-=======
               <th className="p-3">Date</th><th className="p-3">Origine → Destination</th><th className="p-3">Produit</th>
               <th className="p-3">Lot</th><th className="p-3 text-right">Qté (unités)</th><th className="p-3">Statut</th><th className="p-3" />
->>>>>>> koto
             </tr>
           </thead>
           <tbody>
             {items.map((t) => (
               <tr key={t.id} className="border-t">
                 <td className="p-3">{formatDate(t.dateTransfert)}</td>
-<<<<<<< HEAD
-                <td className="p-3">
-                  {t.siteOrigineNom} → {t.siteDestinationNom}
-                </td>
-                <td className="p-3 font-medium">{t.produitNom}</td>
-                <td className="p-3">{t.lotNumero ?? "—"}</td>
-                <td className="p-3 text-right tabular-nums">{t.quantite}</td>
-                <td className="p-3">
-                  <Badge texte={statuts[t.statut]?.t ?? t.statut} ton={statuts[t.statut]?.ton} />
-                </td>
-                <td className="p-3">
-                  {editable && t.statut === "en_attente" && (
-                    <div className="flex gap-2 justify-end">
-                      <Bouton
-                        variante="primaire"
-                        onClick={() => action(() => stockApi.validerTransfert(t.id))}
-                      >
-                        Valider
-                      </Bouton>
-                      <Bouton
-                        variante="danger"
-                        onClick={() =>
-                          action(() => stockApi.annulerTransfert(t.id), "Annuler ce transfert ?")
-                        }
-                      >
-=======
                 <td className="p-3">{t.siteOrigineNom} → {t.siteDestinationNom}</td>
                 <td className="p-3 font-medium">{t.produitNom ?? '—'}</td>
                 <td className="p-3">{t.lotNumero ?? '—'}</td>
@@ -310,7 +197,6 @@ export const PanneauStockTransferts: React.FC<{ mode: ModeAffichage; siteActifId
                       <Bouton variante="danger"
                         onClick={() => action(() => stockApi.annulerTransfert(t.id),
                           'Annuler ce transfert ? Le stock sera remis au site d’origine.')}>
->>>>>>> koto
                         Annuler
                       </Bouton>
                     </div>

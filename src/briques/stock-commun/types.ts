@@ -55,11 +55,7 @@ export interface DispensationDetail {
   numLot: string | null;
   produitNom: string | null;
   datePeremption: string | null; // Y-m-d
-<<<<<<< HEAD
-  quantite: number; // en comprimés
-=======
   quantite: number;              // en unités de base
->>>>>>> koto
 }
 
 export interface Dispensation {
@@ -178,14 +174,7 @@ export interface TransfertPayload {
 }
 
 /* ---- Ajustements ---- */
-<<<<<<< HEAD
-export interface AjustementType {
-  id: number;
-  libelle: string;
-}
-=======
 export interface AjustementType { id: number; libelle: string; code?: string | null }
->>>>>>> koto
 
 export interface Ajustement {
   id: number;
